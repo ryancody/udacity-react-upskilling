@@ -32,6 +32,12 @@ const Search = (props) => {
         }
 
         search(query).then((res) => {
+            if (res?.error) {
+                console.log("no results")
+                setResults([]);
+                return;
+            }
+
             if (res?.length > 0) {
                 setResults(res);
             }

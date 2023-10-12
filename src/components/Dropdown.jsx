@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
-import { update, get } from '../services/BooksAPI';
+import React, { useEffect, useState } from 'react';
 
 const Dropdown = (props) => {
     const book = props.book;
-    const [shelf, setShelf] = useState('none');
-    const handleSelect = (e) => {
-        update(book, e.target.value).then(() => {
-            setShelf(book.shelf);
-        });
-    };
-    get(book.id).then((res) => {
-        setShelf(res.shelf);
-    });
+    const bookMap = props.bookMap;
+    const handleDropdownSelect = props.handleDropdownSelect;
+    const [shelf, setShelf] = useState(bookMap[book.id]?.shelf ?? 'none');
+
+    useEffect(() => {
+        setShelf(bookMap[book.id]?.shelf ?? 'none');
+    }, [bookMap, book.id]);
+
 
     return (
-        <div className="book-shelf-changer">
-            <select onChange={handleSelect} value={shelf}>
-                <option value="none" disabled>Move to...</option>
+        <div>
+            <select onChange={(e) => handleDropdownSelect(e, book)} value={shelf}>
+                <option value="moveTo" disabled>Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>
                 <option value="wantToRead">Want to Read</option>
                 <option value="read">Read</option>

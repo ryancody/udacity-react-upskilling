@@ -3,58 +3,58 @@ import { search, update } from '../services/BooksAPI';
 import Book from './Book';
 import { Link } from 'react-router-dom';
 import { getAll } from '../services/BooksAPI';
+import { debounce } from 'lodash';
 
 const Search = (props) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [bookMap, setBookMap] = useState({});
-    const handleChange = (e) => {
-        setQuery(e.target.value);
-    };
     const refreshBookMap = () => {
         getAll().then((res) => {
-            let bookMap = Object.assign({}, ...res.map((b) => ({[b.id]: b})));
-    
+            let bookMap = Object.assign({}, ...res.map((b) => ({ [b.id]: b })));
+
             setBookMap(bookMap);
         });
     };
     const handleDropdownSelect = (e, book) => {
-        console.log('book', book)
         update(book, e.target.value).then(() => {
             refreshBookMap();
         });
     };
+    const debounceInput = debounce((e) => {
+        setQuery(e.target.value);
+    }, 500);
 
     useEffect(() => {
-        getAll().then((res) => {
-            refreshBookMap();
-        });
-
-        if (query === '') {
+        if (query?.length === 0) {
             setResults([]);
             return;
         }
 
-        console.log('searching', query)
         search(query).then((res) => {
             if (res?.length > 0) {
                 setResults(res);
             }
         });
+
     }, [query]);
+
+    useEffect(() => {
+        refreshBookMap();
+    }, []);
 
     return (
         <div className='p-2'>
             <div className='p-1 border-solid rounded-md border-gray-500'>
                 <label>🔎</label>
-                <input className='' type='text' value={query} onChange={handleChange} name="search" placeholder='Search' />
+                <input className='' type='text' onChange={debounceInput} name="search" placeholder='Search' />
             </div>
             <div className='grid overflow-y-auto grid-cols-6 gap-2'>
                 {results?.map((book) => (
-                    <Book key={book.id} book={book} 
-                        dropBook={props.dropBook} 
-                        showDropdown={true} 
-                        bookMap={bookMap} 
+                    <Book key={book.id} book={book}
+                        dropBook={props.dropBook}
+                        showDropdown={true}
+                        bookMap={bookMap}
                         handleDropdownSelect={handleDropdownSelect} />
                 ))}
             </div>

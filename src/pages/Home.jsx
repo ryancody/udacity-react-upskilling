@@ -13,7 +13,6 @@ const Home = () => {
     const [currentShelf, setCurrentShelf] = useState(null);
     const handleDropBook = (book) => {
         update(book, currentShelf).then(() => {
-            console.log('updated', book, currentShelf)
             getAll().then((res) => {
                 setMyBooks(res);
                 setCurrentShelf(null);
@@ -25,7 +24,6 @@ const Home = () => {
     }
 
     useEffect(() => {
-        console.log('useeffect');
         getAll().then((res) => {
             setMyBooks(res);
         });
